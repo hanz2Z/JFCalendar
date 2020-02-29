@@ -159,7 +159,7 @@
     NSUInteger count = [[NSCalendar currentCalendar] rangeOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitMonth forDate:date].length;
     _daysCount = count;
     
-    NSInteger numInWeekOfFirstDayInMonth = [[NSCalendar currentCalendar] ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitWeekOfMonth forDate:date];
+    NSInteger numInWeekOfFirstDayInMonth = [[NSCalendar currentCalendar] ordinalityOfUnit:NSCalendarUnitWeekday inUnit:NSCalendarUnitWeekOfMonth forDate:date];
     
     NSUInteger dayDiff = _firstWeekday - 1;
 
@@ -193,7 +193,7 @@
     [components setEra:era];
     
     date = [[NSCalendar currentCalendar] dateFromComponents:components];
-    numInWeekOfFirstDayInMonth = [[NSCalendar currentCalendar] ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitWeekOfMonth forDate:date];
+    numInWeekOfFirstDayInMonth = [[NSCalendar currentCalendar] ordinalityOfUnit:NSCalendarUnitWeekday inUnit:NSCalendarUnitWeekOfMonth forDate:date];
     
     if (numInWeekOfFirstDayInMonth != _firstWeekday) {
         if (numInWeekOfFirstDayInMonth < _firstWeekday) {

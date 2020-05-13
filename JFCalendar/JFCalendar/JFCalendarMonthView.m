@@ -159,7 +159,8 @@
     NSUInteger count = [[NSCalendar currentCalendar] rangeOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitMonth forDate:date].length;
     _daysCount = count;
     
-    NSInteger numInWeekOfFirstDayInMonth = [[NSCalendar currentCalendar] ordinalityOfUnit:NSCalendarUnitWeekday inUnit:NSCalendarUnitWeekOfMonth forDate:date];
+    NSDateComponents *weekComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitWeekday fromDate:date];
+    NSInteger numInWeekOfFirstDayInMonth = weekComponents.weekday;
     
     NSUInteger dayDiff = _firstWeekday - 1;
 
@@ -193,7 +194,8 @@
     [components setEra:era];
     
     date = [[NSCalendar currentCalendar] dateFromComponents:components];
-    numInWeekOfFirstDayInMonth = [[NSCalendar currentCalendar] ordinalityOfUnit:NSCalendarUnitWeekday inUnit:NSCalendarUnitWeekOfMonth forDate:date];
+    weekComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitWeekday fromDate:date];
+    numInWeekOfFirstDayInMonth = weekComponents.weekday;
     
     if (numInWeekOfFirstDayInMonth != _firstWeekday) {
         if (numInWeekOfFirstDayInMonth < _firstWeekday) {
@@ -401,7 +403,7 @@
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(nonnull UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 {
-    CGFloat totalWidth = collectionView.frame.size.width;
+    CGFloat totalWidth = collectionView.frame.size.width-1;
     CGFloat size = self.dayViewSize.width;
     CGFloat spacing = (totalWidth - size * 7)/6;
     return spacing;

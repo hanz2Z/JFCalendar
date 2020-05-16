@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class JFCalendarMonthView;
 
 @protocol JFCalendarMonthViewDelegate <NSObject>
@@ -16,13 +18,11 @@
 
 - (void)monthView:(JFCalendarMonthView *_Nonnull)monthView didSelectDate:(NSDate *_Nonnull)date;
 
-- (UIView *_Nonnull)monthView:(JFCalendarMonthView *_Nullable)monthView
+- (UIView *)monthView:(JFCalendarMonthView *_Nullable)monthView
    accessoryViewOnDay:(NSDate *_Nonnull)date
-  reusedAccessoryView:(UIView *_Nonnull)reusedView;
+  reusedAccessoryView:(UIView *)reusedView;
 
 @end
-
-NS_ASSUME_NONNULL_BEGIN
 
 @interface JFCalendarMonthView : UIView
 
@@ -32,7 +32,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) NSUInteger daysCount;
 
 @property (nonatomic, assign) NSUInteger firstWeekday;
-@property (nonatomic, assign) BOOL showDaysInOtherMonth;
+
+@property (nonatomic, strong) UIFont *monthSymbolFont;
+@property (nonatomic, strong) UIColor *monthSymbolColor;
+@property (nonatomic, assign) CGFloat monthSymbolHeight;
 
 @property (nonatomic, strong) UIColor *todayTextColor;
 @property (nonatomic, strong) UIColor *dayTextColor;
@@ -44,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIColor *daySelectedBackgroundColor;
 
 @property (nonatomic, assign) CGSize dayViewSize;
-@property (nonatomic, assign) UIEdgeInsets dayViewEdgeInsets;
+@property (nonatomic, assign) UIEdgeInsets dayTextViewEdgeInsets;
 
 @property (nonatomic, assign) BOOL daysInOtherMonthHidden;
 

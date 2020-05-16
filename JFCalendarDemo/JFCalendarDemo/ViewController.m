@@ -11,6 +11,8 @@
 
 @interface ViewController () <JFCalendarViewDelegate>
 
+@property (nonatomic, weak) id<JFCalendarViewProtocol> calendarView;
+
 @end
 
 @implementation ViewController
@@ -19,16 +21,18 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    self.view.backgroundColor = [UIColor redColor];
+    self.view.backgroundColor = [UIColor whiteColor];
     
-    JFCalendarView *view = [JFCalendarView new];
+    UIView<JFCalendarViewProtocol> *view = [JFVerticalCalendarView new];
+    view.weekdaySymbolLabelHeight = 40;
     view.translatesAutoresizingMaskIntoConstraints = NO;
-    view.backgroundColor = [UIColor clearColor];
+    view.backgroundColor = [UIColor whiteColor];
     view.delegate = self;
     view.dayViewSize = CGSizeMake(40, 50);
-    view.dayViewEdgeInsets = UIEdgeInsetsMake(0, 0, 10, 0);
-    view.scrollDirection = JSCalendarViewScrollVerticalDirection;
+    view.dayTextViewEdgeInsets = UIEdgeInsetsMake(0, 0, 10, 0);
+    //view.scrollDirection = JFCalendarViewScrollVerticalDirection;
     [self.view addSubview:view];
+    self.calendarView = view;
     
     NSDictionary *viewsDictionary = NSDictionaryOfVariableBindings(view);
     
@@ -38,14 +42,21 @@
                                              metrics:nil
                                                views:viewsDictionary]];
     [self.view addConstraints:
-     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-64-[view(340)]-0-|"
+     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-64-[view(400)]"
                                              options:0
                                              metrics:nil
                                                views:viewsDictionary]];
 }
 
-- (void)calendarView:(JFCalendarView *)calendarView didSelectDate:(NSDate *)date
+- (void)calendarView:(id<JFCalendarViewProtocol>)calendarView didDisplayMonth:(NSInteger)month inYear:(NSInteger)year
 {
+    //NSLog(@"year %ld, month %ld showed", (long)year, (long)month);
+}
+
+- (void)calendarView:(id<JFCalendarViewProtocol>)calendarView didSelectDate:(NSDate *)date
+{
+    NSLog(@"did select date : %@", date);
+    
     UIAlertController *alert = [[UIAlertController alloc] init];
     alert.title = [date description];
     UIAlertAction *a = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
@@ -58,7 +69,7 @@
     [calendarView reloadAccessorieOnDate:date];
 }
 
-- (UIView *)calendarView:(JFCalendarView *)calendarView
+- (UIView *)calendarView:(id<JFCalendarViewProtocol>)calendarView
       accessoryViewOnDay:(NSDate *)date
      reusedAccessoryView:(UIView *)reusedView
 {

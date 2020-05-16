@@ -13,7 +13,9 @@
 @property (nonatomic, strong) NSArray *dayList;
 @property (nonatomic, weak) UICollectionView *daysView;
 
-@property (nonatomic, assign) NSInteger selectedIndex;
+//@property (nonatomic, assign) NSInteger selectedIndex;
+
+@property (nonatomic, weak) UILabel *monthSymbolLabel;
 
 @end
 
@@ -39,8 +41,18 @@
     return self;
 }
 
+- (CGSize)intrinsicContentSize
+{
+    NSInteger rowCount = (self.dayList.count + 6) / 7;
+    return CGSizeMake(UIViewNoIntrinsicMetric, rowCount * self.dayViewSize.height + self.monthSymbolHeight);
+}
+
 - (void)initData
 {
+    self.monthSymbolFont = [UIFont boldSystemFontOfSize:17];
+    self.monthSymbolColor = [UIColor colorWithRed:0.235 green:0.275 blue:0.31 alpha:1];
+    self.monthSymbolHeight = 40;
+    
     self.dayTextColor = [UIColor whiteColor];
     self.todayTextColor = [UIColor redColor];
     
@@ -63,6 +75,20 @@
 
 - (void)initSubview
 {
+    UIView *monthView = [UIView new];
+    monthView.translatesAutoresizingMaskIntoConstraints = NO;
+    monthView.clipsToBounds = YES;
+
+    UILabel *monthLabel = [UILabel new];
+    monthLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    monthLabel.font = self.monthSymbolFont;
+    monthLabel.textColor = self.monthSymbolColor;
+    [monthView addSubview:monthLabel];
+
+    self.monthSymbolLabel = monthLabel;
+
+    [self addSubview:monthView];
+    
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
     
     // 根据itemSize和间隔去更新collectionView的frame
@@ -73,10 +99,38 @@
     collectionView.showsVerticalScrollIndicator = NO;
     collectionView.allowsMultipleSelection = NO;
     collectionView.scrollEnabled = NO;
+    collectionView.backgroundColor = [UIColor clearColor];
     [self addSubview:collectionView];
     self.daysView = collectionView;
     
-    NSDictionary *viewsDictionary = NSDictionaryOfVariableBindings(collectionView);
+    NSDictionary *viewsDictionary = NSDictionaryOfVariableBindings(monthView, monthLabel, collectionView);
+    
+    [monthView addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-12-[monthLabel]"
+                                             options:0
+                                             metrics:nil
+                                               views:viewsDictionary]];
+
+    [monthView addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[monthLabel]"
+                                             options:0
+                                             metrics:nil
+                                               views:viewsDictionary]];
+    
+    NSLayoutConstraint *c = [NSLayoutConstraint constraintWithItem:monthLabel attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:monthView attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
+    c.active = YES;
+
+    [self addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[monthView(40)]"
+                                             options:0
+                                             metrics:@{@"height":@(_monthSymbolHeight)}
+                                               views:viewsDictionary]];
+    
+    [self addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[monthView]-0-|"
+                                             options:0
+                                             metrics:nil
+                                               views:viewsDictionary]];
     
     [self addConstraints:
      [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[collectionView]-0-|"
@@ -84,10 +138,13 @@
                                              metrics:nil
                                                views:viewsDictionary]];
     [self addConstraints:
-     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[collectionView]-0-|"
+     [NSLayoutConstraint constraintsWithVisualFormat:@"V:[monthView]-0-[collectionView]-0-|"
                                              options:0
                                              metrics:nil
                                                views:viewsDictionary]];
+    
+    c = [NSLayoutConstraint constraintWithItem:collectionView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:monthView attribute:NSLayoutAttributeBottom multiplier:1 constant:0];
+    c.active = YES;
     
     [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"DayCellID"];
 }
@@ -97,19 +154,27 @@
     _era = era;
     _year = year;
     _month = month;
-    _selectedIndex = -1;
+    _selectedDate = nil;
+    
+    NSDateFormatter* fmt = [[NSDateFormatter alloc] init];
+    fmt.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"zh_CN"];
+    NSArray *monthNameList = fmt.shortMonthSymbols;
+    
+    NSString *monthName = [monthNameList objectAtIndex:(month-1)];
+    if (month == 1) {
+        monthName = [NSString stringWithFormat:@"%lu年%@", (unsigned long)year, monthName];
+    }
+    
+    self.monthSymbolLabel.text = monthName;
     
     [self updateDays];
+    
+    [self invalidateIntrinsicContentSize];
 }
 
 - (void)setYear:(NSUInteger)year month:(NSUInteger)month
 {
-    _era = 1;
-    _year = year;
-    _month = month;
-    _selectedIndex = -1;
-    
-    [self updateDays];
+    [self setEra:1 year:year month:month];
 }
 
 - (void)reloadAccessories
@@ -135,14 +200,29 @@
 {
     _dayViewSize = dayViewSize;
     
+    [self invalidateIntrinsicContentSize];
+
     [self.daysView reloadData];
 }
 
-- (void)setDayViewEdgeInsets:(UIEdgeInsets)dayViewEdgeInsets
+- (void)setDayTextViewEdgeInsets:(UIEdgeInsets)dayViewEdgeInsets
 {
-    _dayViewEdgeInsets = dayViewEdgeInsets;
+    _dayTextViewEdgeInsets = dayViewEdgeInsets;
     
     [self.daysView reloadData];
+}
+
+- (void)setSelectedDate:(NSDate *)selectedDate
+{
+    NSDate *date = _selectedDate;
+    _selectedDate = selectedDate;
+    if (date) {
+        [self reloadCellOnDay:date];
+    }
+    
+    if (selectedDate) {
+        [self reloadCellOnDay:_selectedDate];
+    }
 }
 
 - (void)updateDays
@@ -254,6 +334,23 @@
     }
 }
 
+- (void)reloadCellOnDay:(NSDate *)date
+{
+    NSInteger row = 0;
+    for (NSDate *d in self.dayList) {
+        if ([self sameDay:date andDate:d]) {
+            break;
+        }
+        
+        ++row;
+    }
+    
+    if (row < self.dayList.count) {
+        NSLog(@"reload row %ld", (long)row);
+        [self.daysView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]];
+    }
+}
+
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     return self.dayList.count;
@@ -267,14 +364,18 @@
     
     BOOL isToday = [self sameDay:today andDate:date];
     BOOL sameMonth = [self sameMonth:date];
+    BOOL sameDayWithSelected = NO;
+    if (self.selectedDate) {
+        sameDayWithSelected = [self sameDay:date andDate:self.selectedDate];
+    }
     
     CGFloat width = self.dayViewSize.width;
     CGFloat height = self.dayViewSize.height;
     
-    CGFloat top = self.dayViewEdgeInsets.top;
-    CGFloat left = self.dayViewEdgeInsets.left;
-    CGFloat bottom = self.dayViewEdgeInsets.bottom;
-    CGFloat right = self.dayViewEdgeInsets.right;
+    CGFloat top = self.dayTextViewEdgeInsets.top;
+    CGFloat left = self.dayTextViewEdgeInsets.left;
+    CGFloat bottom = self.dayTextViewEdgeInsets.bottom;
+    CGFloat right = self.dayTextViewEdgeInsets.right;
     
     CGFloat length = MIN(width-left-right, height-top-bottom);
     
@@ -300,11 +401,11 @@
         
         UIView *selectedBGView = [UIView new];
         selectedBGView.translatesAutoresizingMaskIntoConstraints = NO;
-        selectedBGView.backgroundColor = isToday ? self.todaySelectedBackgroundColor : self.daySelectedBackgroundColor;
         selectedBGView.layer.cornerRadius = length/2;
         selectedBGView.tag = 1025;
         [dayContainer addSubview:selectedBGView];
-        if (indexPath.row == self.selectedIndex) {
+        
+        if (sameDayWithSelected) {
             selectedBGView.hidden = NO;
         }
         else {
@@ -340,7 +441,12 @@
 
     UILabel *label = (UILabel *)[dayContainer viewWithTag:1026];
     
-    if (indexPath.row == self.selectedIndex) {
+    UIView *selectedBGView = [cell viewWithTag:1025];
+    selectedBGView.backgroundColor = isToday ? self.todaySelectedBackgroundColor : self.daySelectedBackgroundColor;
+
+    if (sameDayWithSelected) {
+        selectedBGView.hidden = NO;
+        
         if (isToday) {
             label.textColor = self.todaySelectedTextColor;
         }
@@ -349,6 +455,8 @@
         }
     }
     else {
+        selectedBGView.hidden = YES;
+        
         if (isToday) {
             label.textColor = self.todayTextColor;
         }
@@ -357,6 +465,9 @@
         }
     }
     
+    UIView *reusedAccessory = [cell.contentView viewWithTag:1027];
+    [reusedAccessory removeFromSuperview];
+
     if (self.daysInOtherMonthHidden && !sameMonth) {
         label.text = nil;
     }
@@ -365,12 +476,12 @@
         label.text = [@(components.day) stringValue];
         
         if (self.delegate && [self.delegate respondsToSelector:@selector(monthView:accessoryViewOnDay:reusedAccessoryView:)]) {
-            UIView *reusedAccessory = [cell.contentView viewWithTag:1027];
-
-            UIView *view = [self.delegate monthView:self accessoryViewOnDay:date reusedAccessoryView:reusedAccessory];
-            view.tag = 1027;
-            if (view) {
-                [cell.contentView addSubview:view];
+            if (sameMonth || !_daysInOtherMonthHidden) {
+                UIView *view = [self.delegate monthView:self accessoryViewOnDay:date reusedAccessoryView:reusedAccessory];
+                view.tag = 1027;
+                if (view) {
+                    [cell.contentView addSubview:view];
+                }
             }
         }
     }
@@ -411,47 +522,69 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.selectedIndex != -1) {
-        UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIndex inSection:0]];
-        UILabel *label = (UILabel *)[cell viewWithTag:1026];
-        
-        NSDate *date = [self.dayList objectAtIndex:indexPath.row];
-        NSDate *today = [NSDate date];
-        BOOL sameday = [self sameDay:date andDate:today];
-        
-        if (sameday) {
-            label.textColor = self.todayTextColor;
-        }
-        else {
-            label.textColor = self.dayTextColor;
-        }
-        
-        UIView *bgView = [cell viewWithTag:1025];
-        bgView.hidden = YES;
+//    if (self.selectedDate != nil) {
+//        NSInteger row = 0;
+//        for (NSDate *d in self.dayList) {
+//            if ([[NSCalendar currentCalendar] isDate:d inSameDayAsDate:self.selectedDate]) {
+//                break;
+//            }
+//
+//            ++row;
+//        }
+//
+//        if (row < self.dayList.count) {
+//            UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+//            UILabel *label = (UILabel *)[cell viewWithTag:1026];
+//
+//            NSDate *date = [self.dayList objectAtIndex:indexPath.row];
+//            NSDate *today = [NSDate date];
+//            BOOL sameday = [self sameDay:date andDate:today];
+//
+//            if (sameday) {
+//                label.textColor = self.todayTextColor;
+//            }
+//            else {
+//                label.textColor = self.dayTextColor;
+//            }
+//
+//            UIView *bgView = [cell viewWithTag:1025];
+//            bgView.hidden = YES;
+//        }
+//    }
+//
+//    NSDate *date = [self.dayList objectAtIndex:indexPath.row];
+//    self.selectedDate = date;
+//
+//    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+//    UILabel *label = (UILabel *)[cell viewWithTag:1026];
+//
+//    NSDate *today = [NSDate date];
+//    BOOL sameday = [self sameDay:date andDate:today];
+//    if (sameday) {
+//        label.textColor = self.todaySelectedTextColor;
+//    }
+//    else {
+//        label.textColor = self.daySelectedTextColor;
+//    }
+//
+//    UIView *bgView = [cell viewWithTag:1025];
+//    bgView.hidden = NO;
+//
+//    if (self.delegate && [self.delegate respondsToSelector:@selector(monthView:didSelectDate:)]) {
+//        [self.delegate monthView:self didSelectDate:date];
+//    }
+    
+    NSDate *newSelectedDate = [self.dayList objectAtIndex:indexPath.row];
+    NSDate *lastSelectedDate = self.selectedDate;
+    self.selectedDate = newSelectedDate;
+    if (lastSelectedDate) {
+        [self reloadCellOnDay:lastSelectedDate];
     }
     
-    self.selectedIndex = [indexPath row];
-
-    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-    UILabel *label = (UILabel *)[cell viewWithTag:1026];
-    
-    NSDate *date = [self.dayList objectAtIndex:indexPath.row];
-    NSDate *today = [NSDate date];
-    BOOL sameday = [self sameDay:date andDate:today];
-    if (sameday) {
-        label.textColor = self.todaySelectedTextColor;
-    }
-    else {
-        label.textColor = self.daySelectedTextColor;
-    }
-    
-    UIView *bgView = [cell viewWithTag:1025];
-    bgView.hidden = NO;
-    
-    _selectedDate = date;
+    [self reloadCellOnDay:newSelectedDate];
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(monthView:didSelectDate:)]) {
-        [self.delegate monthView:self didSelectDate:date];
+        [self.delegate monthView:self didSelectDate:newSelectedDate];
     }
 }
 

@@ -7,12 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3CA6DB6C246FBF6A0010A922 /* JFCalendarViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CA6DB6B246FBF6A0010A922 /* JFCalendarViewProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3CA6DB6F246FC14B0010A922 /* JFHorizontalCalendarView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CA6DB6D246FC14B0010A922 /* JFHorizontalCalendarView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3CA6DB70246FC14B0010A922 /* JFHorizontalCalendarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CA6DB6E246FC14B0010A922 /* JFHorizontalCalendarView.m */; };
+		3CA6DB74246FC16C0010A922 /* JFVerticalCalendarView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CA6DB72246FC16C0010A922 /* JFVerticalCalendarView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3CA6DB75246FC16C0010A922 /* JFVerticalCalendarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CA6DB73246FC16C0010A922 /* JFVerticalCalendarView.m */; };
+		3CA6DB77246FD4100010A922 /* JFCalendarViewDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CA6DB76246FD4100010A922 /* JFCalendarViewDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3CD4E0FE2374124D0026F1FB /* JFCalendar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CD4E0F42374124D0026F1FB /* JFCalendar.framework */; };
 		3CD4E1032374124D0026F1FB /* JFCalendarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CD4E1022374124D0026F1FB /* JFCalendarTests.m */; };
 		3CD4E1052374124D0026F1FB /* JFCalendar.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD4E0F72374124D0026F1FB /* JFCalendar.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3CD4E112237412740026F1FB /* JFCalendarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CD4E10E237412730026F1FB /* JFCalendarView.m */; };
 		3CD4E113237412740026F1FB /* JFCalendarMonthView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CD4E10F237412730026F1FB /* JFCalendarMonthView.m */; };
-		3CD4E114237412740026F1FB /* JFCalendarView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD4E110237412740026F1FB /* JFCalendarView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3CD4E115237412740026F1FB /* JFCalendarMonthView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD4E111237412740026F1FB /* JFCalendarMonthView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -27,15 +31,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3CA6DB6B246FBF6A0010A922 /* JFCalendarViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JFCalendarViewProtocol.h; sourceTree = "<group>"; };
+		3CA6DB6D246FC14B0010A922 /* JFHorizontalCalendarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JFHorizontalCalendarView.h; sourceTree = "<group>"; };
+		3CA6DB6E246FC14B0010A922 /* JFHorizontalCalendarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JFHorizontalCalendarView.m; sourceTree = "<group>"; };
+		3CA6DB72246FC16C0010A922 /* JFVerticalCalendarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JFVerticalCalendarView.h; sourceTree = "<group>"; };
+		3CA6DB73246FC16C0010A922 /* JFVerticalCalendarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JFVerticalCalendarView.m; sourceTree = "<group>"; };
+		3CA6DB76246FD4100010A922 /* JFCalendarViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JFCalendarViewDelegate.h; sourceTree = "<group>"; };
 		3CD4E0F42374124D0026F1FB /* JFCalendar.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JFCalendar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CD4E0F72374124D0026F1FB /* JFCalendar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JFCalendar.h; sourceTree = "<group>"; };
 		3CD4E0F82374124D0026F1FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3CD4E0FD2374124D0026F1FB /* JFCalendarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JFCalendarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CD4E1022374124D0026F1FB /* JFCalendarTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JFCalendarTests.m; sourceTree = "<group>"; };
 		3CD4E1042374124D0026F1FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3CD4E10E237412730026F1FB /* JFCalendarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JFCalendarView.m; sourceTree = "<group>"; };
 		3CD4E10F237412730026F1FB /* JFCalendarMonthView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JFCalendarMonthView.m; sourceTree = "<group>"; };
-		3CD4E110237412740026F1FB /* JFCalendarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JFCalendarView.h; sourceTree = "<group>"; };
 		3CD4E111237412740026F1FB /* JFCalendarMonthView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JFCalendarMonthView.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -81,8 +89,12 @@
 			children = (
 				3CD4E111237412740026F1FB /* JFCalendarMonthView.h */,
 				3CD4E10F237412730026F1FB /* JFCalendarMonthView.m */,
-				3CD4E110237412740026F1FB /* JFCalendarView.h */,
-				3CD4E10E237412730026F1FB /* JFCalendarView.m */,
+				3CA6DB6B246FBF6A0010A922 /* JFCalendarViewProtocol.h */,
+				3CA6DB6D246FC14B0010A922 /* JFHorizontalCalendarView.h */,
+				3CA6DB6E246FC14B0010A922 /* JFHorizontalCalendarView.m */,
+				3CA6DB72246FC16C0010A922 /* JFVerticalCalendarView.h */,
+				3CA6DB73246FC16C0010A922 /* JFVerticalCalendarView.m */,
+				3CA6DB76246FD4100010A922 /* JFCalendarViewDelegate.h */,
 				3CD4E0F72374124D0026F1FB /* JFCalendar.h */,
 				3CD4E0F82374124D0026F1FB /* Info.plist */,
 			);
@@ -106,8 +118,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				3CD4E115237412740026F1FB /* JFCalendarMonthView.h in Headers */,
+				3CA6DB6F246FC14B0010A922 /* JFHorizontalCalendarView.h in Headers */,
+				3CA6DB74246FC16C0010A922 /* JFVerticalCalendarView.h in Headers */,
 				3CD4E1052374124D0026F1FB /* JFCalendar.h in Headers */,
-				3CD4E114237412740026F1FB /* JFCalendarView.h in Headers */,
+				3CA6DB6C246FBF6A0010A922 /* JFCalendarViewProtocol.h in Headers */,
+				3CA6DB77246FD4100010A922 /* JFCalendarViewDelegate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,7 +223,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3CD4E112237412740026F1FB /* JFCalendarView.m in Sources */,
+				3CA6DB70246FC14B0010A922 /* JFHorizontalCalendarView.m in Sources */,
+				3CA6DB75246FC16C0010A922 /* JFVerticalCalendarView.m in Sources */,
 				3CD4E113237412740026F1FB /* JFCalendarMonthView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

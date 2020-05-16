@@ -17,4 +17,6 @@ FOUNDATION_EXPORT const unsigned char JFCalendarVersionString[];
 // In this header, you should import all the public headers of your framework using statements like #import <JFCalendar/PublicHeader.h>
 
 #import <JFCalendar/JFCalendarMonthView.h>
-#import <JFCalendar/JFCalendarView.h>
+#import <JFCalendar/JFVerticalCalendarView.h>
+#import <JFCalendar/JFHorizontalCalendarView.h>
+#import <JFCalendar/JFCalendarViewDelegate.h>

@@ -13,6 +13,8 @@
 
 @property (nonatomic, weak) id<JFCalendarViewProtocol> calendarView;
 
+@property (nonatomic, strong) NSMutableDictionary *monthData;
+
 @end
 
 @implementation ViewController
@@ -21,9 +23,11 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    self.monthData = [NSMutableDictionary dictionary];
+    
     self.view.backgroundColor = [UIColor whiteColor];
     
-    UIView<JFCalendarViewProtocol> *view = [JFVerticalCalendarView new];
+    UIView<JFCalendarViewProtocol> *view = [JFHorizontalCalendarView new];
     view.weekdaySymbolLabelHeight = 40;
     view.translatesAutoresizingMaskIntoConstraints = NO;
     view.backgroundColor = [UIColor whiteColor];
@@ -50,56 +54,73 @@
 
 - (void)calendarView:(id<JFCalendarViewProtocol>)calendarView didDisplayMonth:(NSInteger)month inYear:(NSInteger)year
 {
-    //NSLog(@"year %ld, month %ld showed", (long)year, (long)month);
+    NSLog(@"year %ld, month %ld showed", (long)year, (long)month);
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self.monthData setValue:@(month+1) forKey:[@(month) stringValue]];
+        [self.calendarView reloadAccessories];
+    });
 }
 
 - (void)calendarView:(id<JFCalendarViewProtocol>)calendarView didSelectDate:(NSDate *)date
 {
     NSLog(@"did select date : %@", date);
     
-    UIAlertController *alert = [[UIAlertController alloc] init];
-    alert.title = [date description];
-    UIAlertAction *a = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        
-    }];
-    [alert addAction:a];
-    
-    [self presentViewController:alert animated:YES completion:nil];
-    
-    [calendarView reloadAccessorieOnDate:date];
+//    UIAlertController *alert = [[UIAlertController alloc] init];
+//    alert.title = [date description];
+//    UIAlertAction *a = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+//
+//    }];
+//    [alert addAction:a];
+//
+//    [self presentViewController:alert animated:YES completion:nil];
+//
+//    [calendarView reloadAccessorieOnDate:date];
 }
 
 - (UIView *)calendarView:(id<JFCalendarViewProtocol>)calendarView
       accessoryViewOnDay:(NSDate *)date
      reusedAccessoryView:(UIView *)reusedView
 {
-    //NSDateComponents *c = [[NSCalendar currentCalendar] components:NSCalendarUnitDay fromDate:date];
+    NSDateComponents *c = [[NSCalendar currentCalendar] components:NSCalendarUnitDay|NSCalendarUnitMonth fromDate:date];
+    NSInteger month = c.month;
+    NSNumber *day = [self.monthData objectForKey:[@(month) stringValue]];
     
     if (reusedView) {
-        if ([calendarView.selectedDate isEqualToDate:date]) {
-            reusedView.backgroundColor = [UIColor whiteColor];
+        if (day && [day integerValue] == c.day) {
+            if ([calendarView.selectedDate isEqualToDate:date]) {
+                reusedView.backgroundColor = [UIColor whiteColor];
+            }
+            else {
+                reusedView.backgroundColor = [UIColor blueColor];
+            }
+            
+            return reusedView;
         }
         else {
-            reusedView.backgroundColor = [UIColor blueColor];
+            return nil;
         }
-        
-        return reusedView;
     }
     else {
-        UIView *dot = [UIView new];
-        dot.layer.cornerRadius = 2;
-        dot.frame = CGRectMake(18, 40, 4, 4);
-        dot.backgroundColor = [UIColor redColor];
-        
-        if ([calendarView.selectedDate isEqualToDate:date]) {
-            dot.backgroundColor = [UIColor whiteColor];
+        if (day && [day integerValue] == c.day) {
+            UIView *dot = [UIView new];
+            dot.layer.cornerRadius = 2;
+            dot.frame = CGRectMake(18, 40, 4, 4);
+            dot.backgroundColor = [UIColor redColor];
+            
+            if ([calendarView.selectedDate isEqualToDate:date]) {
+                dot.backgroundColor = [UIColor whiteColor];
 
+            }
+            else {
+                dot.backgroundColor = [UIColor blueColor];
+            }
+            
+            return dot;
         }
         else {
-            dot.backgroundColor = [UIColor blueColor];
+            return nil;
         }
-        
-        return dot;
     }
 }
 

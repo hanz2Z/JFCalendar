@@ -575,16 +575,22 @@
 //    }
     
     NSDate *newSelectedDate = [self.dayList objectAtIndex:indexPath.row];
-    NSDate *lastSelectedDate = self.selectedDate;
-    self.selectedDate = newSelectedDate;
-    if (lastSelectedDate) {
-        [self reloadCellOnDay:lastSelectedDate];
+
+    if (self.selectedDate) {
+        if (![self sameDay:newSelectedDate andDate:self.selectedDate]) {
+            self.selectedDate = newSelectedDate;
+            
+            if (self.delegate && [self.delegate respondsToSelector:@selector(monthView:didSelectDate:)]) {
+                [self.delegate monthView:self didSelectDate:newSelectedDate];
+            }
+        }
     }
-    
-    [self reloadCellOnDay:newSelectedDate];
-    
-    if (self.delegate && [self.delegate respondsToSelector:@selector(monthView:didSelectDate:)]) {
-        [self.delegate monthView:self didSelectDate:newSelectedDate];
+    else {
+        self.selectedDate = newSelectedDate;
+        
+        if (self.delegate && [self.delegate respondsToSelector:@selector(monthView:didSelectDate:)]) {
+            [self.delegate monthView:self didSelectDate:newSelectedDate];
+        }
     }
 }
 

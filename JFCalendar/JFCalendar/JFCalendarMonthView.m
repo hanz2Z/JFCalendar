@@ -13,9 +13,9 @@
 @property (nonatomic, strong) NSArray *dayList;
 @property (nonatomic, weak) UICollectionView *daysView;
 
-//@property (nonatomic, assign) NSInteger selectedIndex;
-
 @property (nonatomic, weak) UILabel *monthSymbolLabel;
+
+@property (nonatomic, assign) BOOL needReload;
 
 @end
 
@@ -196,20 +196,36 @@
     }
 }
 
+- (void)scheduleReloading
+{
+    _needReload = YES;
+    //__weak typeof(self) ws = self;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [self performSelector:@selector(reloadIfNeeded) withObject:nil afterDelay:0];
+}
+
+- (void)reloadIfNeeded
+{
+    if (_needReload) {
+        [self.daysView reloadData];
+        _needReload = NO;
+    }
+}
+
 - (void)setDayViewSize:(CGSize)dayViewSize
 {
     _dayViewSize = dayViewSize;
     
     [self invalidateIntrinsicContentSize];
-
-    [self.daysView reloadData];
+    
+    [self scheduleReloading];
 }
 
 - (void)setDayTextViewEdgeInsets:(UIEdgeInsets)dayViewEdgeInsets
 {
     _dayTextViewEdgeInsets = dayViewEdgeInsets;
     
-    [self.daysView reloadData];
+    [self scheduleReloading];
 }
 
 - (void)setSelectedDate:(NSDate *)selectedDate
@@ -223,6 +239,48 @@
     if (selectedDate) {
         [self reloadCellOnDay:_selectedDate];
     }
+}
+
+- (void)setDayTextColor:(UIColor *)value
+{
+    _dayTextColor = value;
+    
+    [self scheduleReloading];
+}
+
+- (void)setTodayTextColor:(UIColor *)value
+{
+    _todayTextColor = value;
+    
+    [self scheduleReloading];
+}
+
+- (void)setDaySelectedTextColor:(UIColor *)value
+{
+    _daySelectedTextColor = value;
+    
+    [self scheduleReloading];
+}
+
+- (void)setTodaySelectedTextColor:(UIColor *)value
+{
+    _todaySelectedTextColor = value;
+    
+    [self scheduleReloading];
+}
+
+- (void)setDaySelectedBackgroundColor:(UIColor *)value
+{
+    _daySelectedBackgroundColor = value;
+    
+    [self scheduleReloading];
+}
+
+- (void)setTodaySelectedBackgroundColor:(UIColor *)value
+{
+    _todaySelectedBackgroundColor = value;
+    
+    [self scheduleReloading];
 }
 
 - (void)updateDays
@@ -346,7 +404,6 @@
     }
     
     if (row < self.dayList.count) {
-        NSLog(@"reload row %ld", (long)row);
         [self.daysView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]];
     }
 }
@@ -522,58 +579,6 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-//    if (self.selectedDate != nil) {
-//        NSInteger row = 0;
-//        for (NSDate *d in self.dayList) {
-//            if ([[NSCalendar currentCalendar] isDate:d inSameDayAsDate:self.selectedDate]) {
-//                break;
-//            }
-//
-//            ++row;
-//        }
-//
-//        if (row < self.dayList.count) {
-//            UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
-//            UILabel *label = (UILabel *)[cell viewWithTag:1026];
-//
-//            NSDate *date = [self.dayList objectAtIndex:indexPath.row];
-//            NSDate *today = [NSDate date];
-//            BOOL sameday = [self sameDay:date andDate:today];
-//
-//            if (sameday) {
-//                label.textColor = self.todayTextColor;
-//            }
-//            else {
-//                label.textColor = self.dayTextColor;
-//            }
-//
-//            UIView *bgView = [cell viewWithTag:1025];
-//            bgView.hidden = YES;
-//        }
-//    }
-//
-//    NSDate *date = [self.dayList objectAtIndex:indexPath.row];
-//    self.selectedDate = date;
-//
-//    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-//    UILabel *label = (UILabel *)[cell viewWithTag:1026];
-//
-//    NSDate *today = [NSDate date];
-//    BOOL sameday = [self sameDay:date andDate:today];
-//    if (sameday) {
-//        label.textColor = self.todaySelectedTextColor;
-//    }
-//    else {
-//        label.textColor = self.daySelectedTextColor;
-//    }
-//
-//    UIView *bgView = [cell viewWithTag:1025];
-//    bgView.hidden = NO;
-//
-//    if (self.delegate && [self.delegate respondsToSelector:@selector(monthView:didSelectDate:)]) {
-//        [self.delegate monthView:self didSelectDate:date];
-//    }
-    
     NSDate *newSelectedDate = [self.dayList objectAtIndex:indexPath.row];
 
     if (self.selectedDate) {

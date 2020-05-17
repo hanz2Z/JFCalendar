@@ -15,7 +15,6 @@
 
 @property (nonatomic, strong) NSMutableArray *monthViewList;
 @property (nonatomic, strong) NSMutableArray *leftConstraints;
-@property (nonatomic, strong) NSMutableArray *heightConstrains;
 
 @property (nonatomic, weak) UIView *weekdaySymbolContainer;
 @property (nonatomic, strong) NSArray *weekdaySymbolLabels;
@@ -58,6 +57,13 @@
     self.weekdaySymbolFont = [UIFont boldSystemFontOfSize:10];
     self.weekdaySymbolColor = [UIColor whiteColor];
     self.weekdaySymbolLabelHeight = 60;
+    
+    self.dayTextColor =[UIColor colorWithRed:.2 green:.2 blue:.2 alpha:1];
+    self.todayTextColor = [UIColor colorWithRed:.235 green:.486 blue:.988 alpha:1];
+    self.daySelectedTextColor = [UIColor whiteColor];
+    self.todaySelectedTextColor = [UIColor whiteColor];
+    self.daySelectedBackgroundColor = [UIColor colorWithRed:.235 green:.486 blue:.988 alpha:1];
+    self.todaySelectedBackgroundColor = [UIColor colorWithRed:.235 green:.486 blue:.988 alpha:1];
     
     self.dayViewSize = CGSizeMake(40, 50);
     
@@ -187,11 +193,43 @@
     }
 }
 
+- (JFCalendarMonthView *)createMonthViewWithEra:(NSInteger)era year:(NSInteger)year month:(NSInteger)month withViewArray:(NSMutableArray *)viewList
+{
+    JFCalendarMonthView *monthView = [JFCalendarMonthView new];
+    monthView.translatesAutoresizingMaskIntoConstraints = NO;
+    monthView.dayViewSize = self.dayViewSize;
+    monthView.dayTextViewEdgeInsets = self.dayTextViewEdgeInsets;
+    
+    monthView.dayTextColor = self.dayTextColor;
+    monthView.todayTextColor = self.todayTextColor;
+    monthView.daySelectedTextColor = self.daySelectedTextColor;
+    monthView.todaySelectedTextColor = self.todaySelectedTextColor;
+    monthView.daySelectedBackgroundColor = self.daySelectedBackgroundColor;
+    monthView.todaySelectedBackgroundColor = self.todaySelectedBackgroundColor;
+    
+    [monthView setEra:era year:year month:month];
+    [viewList addObject:monthView];
+    
+    return  monthView;
+}
+
+- (void)makeConstraintsForMonthView:(JFCalendarMonthView *)monthView withLeftConstraitsArray:(NSMutableArray *)leftConstraints
+{
+    NSLayoutConstraint *wc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeWidth multiplier:1 constant:0];
+    [wc setActive:YES];
+    NSLayoutConstraint *hc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeHeight multiplier:1 constant:0];
+    [hc setActive:YES];
+    NSLayoutConstraint *tc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeTop multiplier:1 constant:0];
+    [tc setActive:YES];
+    NSLayoutConstraint *lc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeLeft multiplier:1 constant:0];
+    [lc setActive:YES];
+    [leftConstraints addObject:lc];
+}
+
 - (void)createMonthViews
 {
     NSMutableArray *viewList = [NSMutableArray array];
     NSMutableArray *leftConstraints = [NSMutableArray array];
-    NSMutableArray *heightConstrains = [NSMutableArray array];
     
     NSInteger era = currentEra;
     NSInteger year = currentYear;
@@ -199,43 +237,14 @@
     
     [self previousMonth:&year month:&month era:&era];
     
-    JFCalendarMonthView *monthView = [JFCalendarMonthView new];
-    monthView.translatesAutoresizingMaskIntoConstraints = NO;
-    monthView.dayViewSize = self.dayViewSize;
-    monthView.dayTextViewEdgeInsets = self.dayTextViewEdgeInsets;
-    [monthView setEra:era year:year month:month];
+    JFCalendarMonthView *monthView = [self createMonthViewWithEra:era year:year month:month withViewArray:viewList];
     [self.monthViewContainer addSubview:monthView];
-    NSLayoutConstraint *wc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeWidth multiplier:1 constant:0];
-    [wc setActive:YES];
-    NSLayoutConstraint *hc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeHeight multiplier:1 constant:0];
-    [hc setActive:YES];
-    [heightConstrains addObject:hc];
-    NSLayoutConstraint *tc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeTop multiplier:1 constant:0];
-    [tc setActive:YES];
-    NSLayoutConstraint *lc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeLeft multiplier:1 constant:0];
-    [lc setActive:YES];
-    [leftConstraints addObject:lc];
-    [viewList addObject:monthView];
-    
-    monthView = [JFCalendarMonthView new];
-    monthView.translatesAutoresizingMaskIntoConstraints = NO;
-    monthView.dayViewSize = self.dayViewSize;
-    monthView.dayTextViewEdgeInsets = self.dayTextViewEdgeInsets;
+    [self makeConstraintsForMonthView:monthView withLeftConstraitsArray:leftConstraints];
+        
+    monthView = [self createMonthViewWithEra:currentEra year:currentYear month:currentMonth withViewArray:viewList];
     monthView.delegate = self;
-    [monthView setEra:currentEra year:currentYear month:currentMonth];
     [self.monthViewContainer addSubview:monthView];
-    wc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeWidth multiplier:1 constant:0];
-    [wc setActive:YES];
-    hc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeHeight multiplier:1 constant:0];
-    [hc setActive:YES];
-    [heightConstrains addObject:hc];
-    tc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeTop multiplier:1 constant:0];
-    [tc setActive:YES];
-    lc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeLeft multiplier:1 constant:0];
-    [lc setActive:YES];
-    [leftConstraints addObject:lc];
-    
-    [viewList addObject:monthView];
+    [self makeConstraintsForMonthView:monthView withLeftConstraitsArray:leftConstraints];
     
     era = currentEra;
     year = currentYear;
@@ -243,28 +252,12 @@
     
     [self nextMonth:&year month:&month era:&era];
 
-    monthView = [JFCalendarMonthView new];
-    monthView.translatesAutoresizingMaskIntoConstraints = NO;
-    monthView.dayViewSize = self.dayViewSize;
-    monthView.dayTextViewEdgeInsets = self.dayTextViewEdgeInsets;
-    [monthView setEra:era year:year month:month];
+    monthView = [self createMonthViewWithEra:era year:year month:month withViewArray:viewList];
     [self.monthViewContainer addSubview:monthView];
-    [viewList addObject:monthView];
-    wc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeWidth multiplier:1 constant:0];
-    [wc setActive:YES];
-    hc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeHeight multiplier:1 constant:0];
-    [hc setActive:YES];
-    [heightConstrains addObject:hc];
-    tc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeTop multiplier:1 constant:0];
-    [tc setActive:YES];
-    
-    lc = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.monthViewContainer attribute:NSLayoutAttributeLeft multiplier:1 constant:0];
-    [lc setActive:YES];
-    [leftConstraints addObject:lc];
+    [self makeConstraintsForMonthView:monthView withLeftConstraitsArray:leftConstraints];
     
     self.monthViewList = viewList;
     self.leftConstraints = leftConstraints;
-    self.heightConstrains = heightConstrains;
 }
 
 - (void)setDayViewSize:(CGSize)value

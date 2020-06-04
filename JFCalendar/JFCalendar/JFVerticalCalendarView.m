@@ -70,11 +70,12 @@
         
         self.needLocationToCurrentMonth = NO;
     }
-    
-    __weak typeof(self) ws = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [ws.collectionView.collectionViewLayout invalidateLayout];
-    });
+    else {
+        __weak typeof(self) ws = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ws.collectionView.collectionViewLayout invalidateLayout];
+        });
+    }
 }
 
 - (void)initData
@@ -328,6 +329,17 @@
      }
 }
 
+- (void)setSelectedDate:(NSDate *)value
+{
+    selectedDate = value;
+
+    NSArray *array = [self.collectionView visibleCells];
+    for (UICollectionViewCell *cell in array) {
+        JFCalendarMonthView *monthView = [cell.contentView viewWithTag:64];
+        monthView.selectedDate = selectedDate;
+    }
+}
+
 - (void)setDayViewSize:(CGSize)value
 {
     dayViewSize = value;
@@ -424,6 +436,13 @@
         JFCalendarMonthView *monthView = [cell.contentView viewWithTag:64];
         monthView.daySelectedBackgroundColor = value;
     }
+}
+
+- (void)setMonthSymbolHeight:(CGFloat)value
+{
+    monthSymbolHeight = value;
+
+    [self.collectionView reloadData];
 }
 
 #pragma mark - UICollectionViewDataSource

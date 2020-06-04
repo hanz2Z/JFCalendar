@@ -17,6 +17,8 @@
 
 @property (nonatomic, assign) BOOL needReload;
 
+@property (nonatomic, strong) NSLayoutConstraint *monthSymbolHConstraint;
+
 @end
 
 @implementation JFCalendarMonthView
@@ -123,8 +125,12 @@
     [self addConstraints:
      [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[monthView(40)]"
                                              options:0
-                                             metrics:@{@"height":@(_monthSymbolHeight)}
+                                             metrics:nil
                                                views:viewsDictionary]];
+    
+    c = [NSLayoutConstraint constraintWithItem:monthView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:_monthSymbolHeight];
+    c.active = YES;
+    self.monthSymbolHConstraint = c;
     
     [self addConstraints:
      [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[monthView]-0-|"
@@ -281,6 +287,13 @@
     _todaySelectedBackgroundColor = value;
     
     [self scheduleReloading];
+}
+
+- (void)setMonthSymbolHeight:(CGFloat)value
+{
+    _monthSymbolHeight = value;
+    self.monthSymbolHConstraint.constant = value;
+    [self invalidateIntrinsicContentSize];
 }
 
 - (void)updateDays
